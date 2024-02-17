@@ -1,48 +1,47 @@
-interface ICharacter {
-  name: string;
-  level: number;
-  introduce(phrase: string): void;
-  levelUp(): void;
+/* Створи клас Library та опиши його інтерфейс
+books (масив) масив книг в бібілотеці
+метод add() буде додавати книгу в масив (екземпляр класу Book)
+метод borrowBook() для оренди книги який приймає назву книги
+метод getBorrowedBooks повертає масив всіх орендованих книг
+метод getAvailableBooks повертає масив всіх доступних книг */
+interface ILibrary {
+  books: Book[];
+  add(book: Book): void;
+  borrowBook(bookName: string): void;
+  getBorrowedBooks(): Book[];
+  getAvailableBooks(): Book[];
 }
-interface ISpellCaster {
-  castSpell(): void;
-}
-// реалізація класу Wizard -OCP-Open-closed principle- 'implements'
-class Wizard implements ICharacter, ISpellCaster {
-  constructor(public name: string, public level: number) {
-    if (this.level < 1) {
-      throw new Error("Level too low");
+
+class Library implements ILibrary {
+  books: Book[] = [];
+  add(book: Book): void {
+    this.books.push(book);
+  }
+  borrowBook(bookName: string): void {
+    const book = this.books.find((book) => book.name == bookName);
+    if (book) {
+      book.isBorrowed = true;
     }
   }
-
-  introduce(phrase: string): void {
-    console.log(phrase + ", " + this.name);
+  getBorrowedBooks(): Book[] {
+    return this.books.filter((book) => book.isBorrowed);
   }
-
-  castSpell(): void {
-    console.log("Casting a spell, behold my power!");
-  }
-
-  levelUp(): void {
-    this.level++;
-    console.log(`Level up! New level is ${this.level}`);
+  getAvailableBooks(): Book[] {
+    return this.books.filter((book) => !book.isBorrowed);
   }
 }
 
-// тестування класу
-const wizard = new Wizard("Merlin", 15);
+class Book {
+  isBorrowed: boolean;
+  constructor(public name: string) {}
+}
 
-wizard.introduce("I am the mighty wizard");
-wizard.castSpell(); // Casting a spell, behold my power!
-wizard.levelUp(); // Level up! New level is 16
-
-export { ICharacter, ISpellCaster, Wizard };
-
-/*
-  Ви створюєте гру, де є персонажі з різними ролями.
-  Зараз ви працюєте над класом Wizard, який має реалізовувати два інтерфейси - ICharacter та ISpellCaster.
-
-  Визначте інтерфейси ICharacter та ISpellCaster так, щоб вони відповідали вимогам класу Wizard. 
-  Інтерфейс ICharacter повинен включати властивості name і level, і навіть метод introduce і levelUp. 
-  Інтерфейс ISpellCaster повинен включати метод castSpell.
-*/
+const library = new Library();
+library.add(new Book("Harry Potter"));
+library.add(new Book("Lord of the Rings"));
+library.add(new Book("The Hobbit"));
+library.add(new Book("The Alchemist"));
+library.borrowBook("The Hobbit");
+library.borrowBook("Lord of the Rings");
+console.dir(library.getAvailableBooks());
+console.dir(library.getBorrowedBooks());
